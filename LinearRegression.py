@@ -3,13 +3,14 @@ import pandas as pd
 
 
 def normalize(np_arr):
+    np_arr = np.array(np_arr)
     min_arr = np.min(np_arr)
     max_arr = np.max(np_arr)
     return (np_arr - min_arr) / (max_arr - min_arr)
 
 
-class LinearRegression:
-    def __init__(self, learning_rate, stop_crit):
+class LinearRegressionScratch:
+    def __init__(self, learning_rate=0.0001, stop_crit=0.001):
         self.gradient = None
         self.w0 = None
         self.w1 = None
