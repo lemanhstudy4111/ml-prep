@@ -3,54 +3,68 @@ import pandas as pd
 
 
 def normalize(np_arr):
-    np_arr = np.array(np_arr)
-    min_arr = np.min(np_arr)
-    max_arr = np.max(np_arr)
-    return (np_arr - min_arr) / (max_arr - min_arr)
+    arr_min = np.min(np_arr)
+    arr_max = np.max(np_arr)
+    return (np_arr - arr_min) / (arr_max - arr_min)
 
 
 class LinearRegressionScratch:
-    def __init__(self, learning_rate=0.0001, stop_crit=0.001):
-        self.weights = None  # first weight is w0 intercept
-        self.learning_rate = learning_rate
-        self.stop_crit = stop_crit
+    def __init__(self, a=0.001, epoch=1000, epsilon=0.1):
+        self.a = a
+        self.epoch = epoch
+        self.epsilon = epsilon
+        self.weights = None
 
-    def fn(self, X):
+    def get_predicted_values(self, weights, X):
+        return weights[0] + np.dot(X, weights[1:])
+
+    def compute_gradients(self, weights, X, y, n):
         """
-        function to get predicted score from model
+        Compute gradient based on X and y. Hypothesis = w0 + w1x1 + w2x2 + ...
         Args:
-            X (_type_): 2D array of features
-        return 1d model of len(X)
+            weights (_type_): 1d np array length m (features) + 1
+            X (_type_): 2D np array for features
+            y (_type_): 1D np array for labels
         """
+        predicted_X = self.get_predicted_values(
+            weights, X
+        )  # 1d array of len=len(weights) - 1
+        residual = predicted_X - y
+        residual_features = np.multiply(X.T, residual)
+        return (
+            1 / n * residual_features
+        )  # 1d array of gradient of each feature
 
-    def compute_gradient(self, wb, X, y):
-        n = len(X)
-        sum_residual = np.sum((self.w0 + self.weights * X) - y) * wb
-        return 1 / n * sum_residual
+    def update_weights(self, weights, gradients):
+        new_weights = weights - self.a * gradients  # w0 = w0 - a*gradient_w0
+        return new_weights
 
-    def update_weight(self, gradients):
-        self.weights -= self.learning_rate * gradients
-
-    def compute_err(self, X, y):
-        n = len(X)
-        return 1 / (2 * n) * (np.sum(((self.w0 * X + self.w1) - y) ** 2))
+    def compute_err(self, n, weights, X):
+        predicted_values = self.get_predicted_values(weights, X)
+        return 1 / (2 * n) * np.sum(predicted_values**2)
 
     def fit(self, X, y):
+        """
+        Fit linear regression line based on gradient descent
+
+        Args:
+            X (_type_): 2D np array for features
+            y (_type_): 1D np array for labels
+        """
+        n = len(X)
         X = normalize(X)
         y = normalize(y)
-        n = len(X)
-        self.w0 = np.random.rand()
-        self.weights = np.random.rand(n)
-        gradients = None
-        last_err = 0
-        while True:
-            gradients = self.compute_gradient(self.w0, X, y)
-            self.update_weight(g0=g0, g1=g1)
-            curr_err = self.compute_err(X, y) - last_err
-            if curr_err < self.stop_crit:
+        weights = np.random.rand(len(X[0]) + 1)  # including intercept
+        for _ in range(self.epoch):
+            gradients = self.compute_gradients(weights, X, y, n)
+            new_weights = self.update_weights(weights, gradients)
+            old_err = self.compute_err(n, weights, X)
+            new_err = self.compute_err(n, new_weights, X)
+            if abs(new_err - old_err) < self.epsilon:
                 break
-            last_err = curr_err
+            weights = new_weights
+        self.weights = weights
         return
 
-    def predict(self, X):
-        return self.w0 * X + self.w1
+    def predict(self, X_test):
+        return self.get_predicted_values(self.weights, X_test)

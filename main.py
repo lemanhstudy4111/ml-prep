@@ -3,6 +3,16 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from LinearRegression import LinearRegressionScratch
+"""
+   x1  x2
+   1   2
+   2   3
+   
+w1= 2, w2 = 3
+2*1 + 3*2 = 8
+2*2 + 3*3 = 13
+"""
+print(np.dot(np.array([[1,2], [2,3]]), np.array([2,3])))
 
 n_samples, n_features = 10, 5
 rng = np.random.RandomState(0)
