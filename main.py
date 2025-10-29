@@ -4,7 +4,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from LinearRegression import LinearRegressionScratch
 
-n_samples, n_features = 10, 1
+n_samples, n_features = 10, 5
 rng = np.random.RandomState(0)
 y = rng.randn(n_samples)
 X = rng.randn(n_samples, n_features)
