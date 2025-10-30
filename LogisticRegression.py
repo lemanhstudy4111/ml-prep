@@ -49,5 +49,12 @@ class LogisitcRegressionScratch:
             self.weights = new_weights
         return
 
+    def predict_proba(self, X_test):
+        if self.fit_intercept:
+            X_test = self.add_intercept
+        return self.get_sigmoid(
+            self.get_predicted_values(self.weights, X_test)
+        )
+
     def predict(self, X_test):
-        return self.get_predicted_values(self.weights, X_test)
+        return self.predict_proba(X_test).round()
